@@ -3,6 +3,7 @@ from django.db import models
 
 class Currency(models.Model):
     title = models.CharField(max_length=120)
+    code = models.CharField(max_length=120, null=True)
 
     compared_currencies = models.ManyToManyField(
         'self',
