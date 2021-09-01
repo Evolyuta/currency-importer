@@ -13,7 +13,6 @@ class Currency(models.Model):
 
 
 class CurrencyCompare(models.Model):
-    first_currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='from_first_currency')
-    second_currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='from_second_currency')
-    value_1 = models.FloatField()
-    value_2 = models.FloatField()
+    from_currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='from_currency')
+    to_currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='to_currency')
+    ratio = models.FloatField()
