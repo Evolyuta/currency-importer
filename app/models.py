@@ -3,3 +3,17 @@ from django.db import models
 
 class Currency(models.Model):
     title = models.CharField(max_length=120)
+
+    compared_currencies = models.ManyToManyField(
+        'self',
+        through='CurrencyCompare',
+        symmetrical=False,
+        related_name='compared_to'
+    )
+
+
+class CurrencyCompare(models.Model):
+    first_currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='from_first_currency')
+    second_currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='from_second_currency')
+    value_1 = models.FloatField()
+    value_2 = models.FloatField()
