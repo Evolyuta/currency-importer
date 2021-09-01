@@ -1,3 +1,5 @@
 from django.shortcuts import render
 
-# Create your views here.
+
+def currency_importer_view(request, *args, **kwargs):
+    return render(request, 'currency-importer.html', {})
