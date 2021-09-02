@@ -1,3 +1,7 @@
+from django.http.response import Http404
+from django.shortcuts import get_object_or_404
+
+
 class CoreRepository:
     model = None
 
@@ -18,7 +22,10 @@ class CoreRepository:
 
     # Getting model instance
     def get(self, **kwargs):
-        return self.get_queryset().get(**kwargs)
+        try:
+            return get_object_or_404(self.model, **kwargs)
+        except Http404:
+            return None
 
     # Creating model instance
     def create(self, **kwargs):
