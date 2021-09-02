@@ -1,7 +1,6 @@
-from django.core.paginator import Paginator
+class CoreRepository:
+    model = None
 
-
-class ModelService:
     def __init__(self):
         pass
 
