@@ -9,10 +9,10 @@
 </head>
 <body>
 <div class="container">
-    <form>
-        <button type="submit" class="btn btn-primary">Submit</button>
+    <form class="mt-4" method="post" action=".">{% csrf_token %}
+        <button type="submit" class="btn btn-primary">Import</button>
     </form>
-    <table class="table">
+    <table class="table mt-4">
         <thead>
         <tr>
             <th scope="col">#</th>

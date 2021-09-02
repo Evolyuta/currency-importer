@@ -39,7 +39,6 @@ INSTALLED_APPS = [
 
     # custom
     'app',
-    'services'
 ]
 
 MIDDLEWARE = [
