@@ -9,10 +9,12 @@ from services.currency_api_service import CurrencyApiService
 class CurrencyService:
     api_service = None
     currency_repository = None
+    currency_compare_repository = None
 
     def __init__(self):
         self.api_service = CurrencyApiService()
         self.currency_repository = CurrencyRepository()
+        self.currency_compare_repository = CurrencyCompareRepository()
 
     # Importing currency list by data from api
     def import_currency_list(self):
@@ -40,7 +42,7 @@ class CurrencyService:
     # Importing currency compare list by data from api
     def import_currency_compare_list(self):
         currency_repository = self.currency_repository
-        currency_compare_repository = CurrencyCompareRepository()
+        currency_compare_repository = self.currency_compare_repository
 
         currencies = currency_repository.get_list()
 
@@ -75,3 +77,23 @@ class CurrencyService:
                                 instance_id=currency_compare.id,
                                 ratio=ratio,
                             )
+
+    # Getting data for currency compare view
+    def get_data_for_compare_view(self):
+        currency_repository = self.currency_repository
+
+        currency_compare_list = self.currency_compare_repository.get_list()
+        currency_compare_list_view = []
+
+        for currency_compare_item in currency_compare_list:
+            currency = currency_repository.get(id=currency_compare_item.from_currency_id)
+            currency_compared = currency_repository.get(id=currency_compare_item.to_currency_id)
+            ratio = currency_compare_item.ratio
+
+            currency_compare_list_view.append({
+                'currency_title': currency.title,
+                'currency_compared_title': currency_compared.title,
+                'ratio': ratio,
+            })
+
+        return currency_compare_list_view

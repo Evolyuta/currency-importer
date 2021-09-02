@@ -22,12 +22,14 @@
         </tr>
         </thead>
         <tbody>
+        {% for instance in object_list %}
         <tr>
-            <th scope="row">1</th>
-            <td>USD</td>
-            <td>RUB</td>
-            <td>80</td>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{instance.currency_title}}</td>
+            <td>{{instance.currency_compared_title}}</td>
+            <td>{{instance.ratio}}</td>
         </tr>
+        {% endfor %}
         </tbody>
     </table>
 </div>
