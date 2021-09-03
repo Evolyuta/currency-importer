@@ -1,0 +1,14 @@
+{% extends 'admin/change_list.html' %}
+
+{% block object-tools %}
+<div>
+
+    <form class="mt-4" method="post" action="import/">{% csrf_token %}
+        <div class="submit-row">
+            <input type="submit" value="Import">
+        </div>
+    </form>
+</div>
+<br/>
+{{ block.super }}
+{% endblock %}

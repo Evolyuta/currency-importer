@@ -13,6 +13,10 @@ class Currency(models.Model):
         related_name='compared_to'
     )
 
+    class Meta:
+        # Plural model label name
+        verbose_name_plural = 'Currencies'
+
 
 class CurrencyComparison(models.Model):
     from_currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='from_currency')
