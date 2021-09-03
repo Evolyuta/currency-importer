@@ -7,13 +7,13 @@ class Currency(models.Model):
 
     compared_currencies = models.ManyToManyField(
         'self',
-        through='CurrencyCompare',
+        through='CurrencyComparison',
         symmetrical=False,
         related_name='compared_to'
     )
 
 
-class CurrencyCompare(models.Model):
+class CurrencyComparison(models.Model):
     from_currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='from_currency')
     to_currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='to_currency')
     ratio = models.FloatField()

@@ -1,7 +1,7 @@
 import itertools
 
 from normalizers.currency_normalizer import CurrencyNormalizer
-from repositories.currency_compare_repository import CurrencyCompareRepository
+from repositories.currency_comparison_repository import CurrencyComparisonRepository
 from repositories.currency_repository import CurrencyRepository
 from services.currency_api_service import CurrencyApiService
 
@@ -9,12 +9,12 @@ from services.currency_api_service import CurrencyApiService
 class CurrencyService:
     api_service = None
     currency_repository = None
-    currency_compare_repository = None
+    currency_comparison_repository = None
 
     def __init__(self):
         self.api_service = CurrencyApiService()
         self.currency_repository = CurrencyRepository()
-        self.currency_compare_repository = CurrencyCompareRepository()
+        self.currency_comparison_repository = CurrencyComparisonRepository()
 
     # Importing currency list by data from api
     def import_currency_list(self):
@@ -39,10 +39,10 @@ class CurrencyService:
                     title=title,
                 )
 
-    # Importing currency compare list by data from api
-    def import_currency_compare_list(self):
+    # Importing currency comparison list by data from api
+    def import_currency_comparison_list(self):
         currency_repository = self.currency_repository
-        currency_compare_repository = self.currency_compare_repository
+        currency_comparison_repository = self.currency_comparison_repository
 
         currencies = currency_repository.get_list()
 
@@ -61,39 +61,39 @@ class CurrencyService:
                         currency_id = currency.id
                         ratio = api_currency_ratios[compared_currency_code]
 
-                        currency_compare = currency_compare_repository.get(
+                        currency_comparison = currency_comparison_repository.get(
                             from_currency_id=currency_id,
                             to_currency_id=compared_currency_id
                         )
 
-                        if not currency_compare:
-                            currency_compare_repository.create(
+                        if not currency_comparison:
+                            currency_comparison_repository.create(
                                 from_currency_id=currency_id,
                                 to_currency_id=compared_currency_id,
                                 ratio=ratio
                             )
-                        elif ratio != currency_compare.ratio:
-                            currency_compare_repository.update(
-                                instance_id=currency_compare.id,
+                        elif ratio != currency_comparison.ratio:
+                            currency_comparison_repository.update(
+                                instance_id=currency_comparison.id,
                                 ratio=ratio,
                             )
 
-    # Getting data for currency compare view
-    def get_data_for_compare_view(self):
+    # Getting data for currency comparison view
+    def get_data_for_comparison_view(self):
         currency_repository = self.currency_repository
 
-        currency_compare_list = self.currency_compare_repository.get_list()
-        currency_compare_list_view = []
+        currency_comparison_list = self.currency_comparison_repository.get_list()
+        currency_comparison_list_view = []
 
-        for currency_compare_item in currency_compare_list:
-            currency = currency_repository.get(id=currency_compare_item.from_currency_id)
-            currency_compared = currency_repository.get(id=currency_compare_item.to_currency_id)
-            ratio = currency_compare_item.ratio
+        for currency_comparison_item in currency_comparison_list:
+            currency = currency_repository.get(id=currency_comparison_item.from_currency_id)
+            currency_compared = currency_repository.get(id=currency_comparison_item.to_currency_id)
+            ratio = currency_comparison_item.ratio
 
-            currency_compare_list_view.append({
+            currency_comparison_list_view.append({
                 'currency_title': currency.title,
                 'currency_compared_title': currency_compared.title,
                 'ratio': ratio,
             })
 
-        return currency_compare_list_view
+        return currency_comparison_list_view
