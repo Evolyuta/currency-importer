@@ -77,23 +77,3 @@ class CurrencyService:
                                 instance_id=currency_comparison.id,
                                 ratio=ratio,
                             )
-
-    # Getting data for currency comparison view
-    def get_data_for_comparison_view(self):
-        currency_repository = self.currency_repository
-
-        currency_comparison_list = self.currency_comparison_repository.get_list()
-        currency_comparison_list_view = []
-
-        for currency_comparison_item in currency_comparison_list:
-            currency = currency_repository.get(id=currency_comparison_item.from_currency_id)
-            currency_compared = currency_repository.get(id=currency_comparison_item.to_currency_id)
-            ratio = currency_comparison_item.ratio
-
-            currency_comparison_list_view.append({
-                'currency_title': currency.title,
-                'currency_compared_title': currency_compared.title,
-                'ratio': ratio,
-            })
-
-        return currency_comparison_list_view
