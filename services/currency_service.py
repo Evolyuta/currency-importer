@@ -1,6 +1,5 @@
-import itertools
+from json import JSONDecodeError
 
-from normalizers.currency_normalizer import CurrencyNormalizer
 from repositories.currency_comparison_repository import CurrencyComparisonRepository
 from repositories.currency_repository import CurrencyRepository
 from services.currency_api_service import CurrencyApiService
@@ -16,29 +15,6 @@ class CurrencyService:
         self.currency_repository = CurrencyRepository()
         self.currency_comparison_repository = CurrencyComparisonRepository()
 
-    # Importing currency list by data from api
-    def import_currency_list(self):
-        api_data = self.api_service.get_all_currencies()
-        currency_data_normalized = CurrencyNormalizer.normalize(api_data)
-        currency_repository = self.currency_repository
-
-        for currency_item_normalized in currency_data_normalized:
-            title = currency_item_normalized['title']
-            code = currency_item_normalized['code']
-
-            currency = currency_repository.get(code=code)
-
-            if not currency:
-                currency_repository.create(
-                    title=title,
-                    code=code,
-                )
-            elif title != currency.title:
-                currency_repository.update(
-                    instance_id=currency.id,
-                    title=title,
-                )
-
     # Importing currency comparison list by data from api
     def import_currency_comparison_list(self):
         currency_repository = self.currency_repository
@@ -46,34 +22,46 @@ class CurrencyService:
 
         currencies = currency_repository.get_list()
 
+        errors = []
+
         for currency in currencies:
             currency_code = currency.code
+            currency_code_lower = currency_code.lower()
 
-            api_currency_ratios = self.api_service.get_ratios_for_currency(currency_code)[currency_code]
-            api_currency_ratios = dict(itertools.islice(api_currency_ratios.items(), 2))
+            try:
+                api_currency_ratios = self.api_service.get_ratios_for_currency(currency_code_lower)
 
-            for compared_currency_code in api_currency_ratios:
-                if compared_currency_code != currency_code:
-                    compared_currency = currency_repository.get(code=compared_currency_code)
+                compared_currencies = currency_repository.get_list()
 
-                    if compared_currency:
-                        compared_currency_id = compared_currency.id
-                        currency_id = currency.id
-                        ratio = api_currency_ratios[compared_currency_code]
+                for compared_currency in compared_currencies:
+                    compared_currency_code_lower = compared_currency.code.lower()
 
-                        currency_comparison = currency_comparison_repository.get(
-                            from_currency_id=currency_id,
-                            to_currency_id=compared_currency_id
-                        )
+                    if compared_currency_code_lower != currency_code_lower:
 
-                        if not currency_comparison:
-                            currency_comparison_repository.create(
+                        if api_currency_ratios.get(compared_currency_code_lower):
+                            ratio = api_currency_ratios[compared_currency_code_lower]
+
+                            compared_currency_id = compared_currency.id
+                            currency_id = currency.id
+
+                            currency_comparison = currency_comparison_repository.get(
                                 from_currency_id=currency_id,
-                                to_currency_id=compared_currency_id,
-                                ratio=ratio
+                                to_currency_id=compared_currency_id
                             )
-                        elif ratio != currency_comparison.ratio:
-                            currency_comparison_repository.update(
-                                instance_id=currency_comparison.id,
-                                ratio=ratio,
-                            )
+
+                            if not currency_comparison:
+                                currency_comparison_repository.create(
+                                    from_currency_id=currency_id,
+                                    to_currency_id=compared_currency_id,
+                                    ratio=ratio
+                                )
+                            elif ratio != currency_comparison.ratio:
+                                currency_comparison_repository.update(
+                                    instance_id=currency_comparison.id,
+                                    ratio=ratio,
+                                )
+
+            except JSONDecodeError:
+                errors.append(f'Api request error for currency with code "{currency_code}"')
+
+        return errors

@@ -20,6 +20,10 @@
 
 # Использование
 
+-) Зайти в /admin/app/currency/
+
+-) Создать несколько валют
+
 -) Зайти в /admin/app/currencycomparison/
 
 -) Нажать на кнопку "Import"

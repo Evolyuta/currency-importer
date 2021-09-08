@@ -30,10 +30,12 @@ class CurrencyComparisonAdmin(admin.ModelAdmin):
     def import_currencies(self, request):
         currency_service = CurrencyService()
 
-        currency_service.import_currency_list()
-        currency_service.import_currency_comparison_list()
+        import_errors = currency_service.import_currency_comparison_list()
 
-        self.message_user(request, "All currencies are imported")
+        if import_errors:
+            for import_error in import_errors:
+                self.message_user(request, import_error, 30)
+
         return HttpResponseRedirect("../")
 
 

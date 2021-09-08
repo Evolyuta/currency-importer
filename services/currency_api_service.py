@@ -13,7 +13,7 @@ class CurrencyApiService:
 
     # Getting all currency ratios to other currencies from API
     def get_ratios_for_currency(self, currency_code):
-        return self.__send_get_request(f'currencies/{currency_code}')
+        return self.__send_get_request(f'currencies/{currency_code}')[currency_code]
 
     # Sending request to API
     def __send_get_request(self, endpoint):
